@@ -38,7 +38,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 .fileinput{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
 label.btn{display:inline-block}
 label.btn:focus-within{outline:2px solid var(--focus);outline-offset:2px}
-.dropping::after{content:'Drop a backup, game file or logo image';position:fixed;inset:12px;border:3px dashed var(--accent);border-radius:14px;background:rgba(31,68,51,.12);display:grid;place-items:center;font-size:1.25rem;font-weight:700;color:var(--ink);z-index:60;pointer-events:none}
+.dropping::after{content:'Drop a deck file or logo image';position:fixed;inset:12px;border:3px dashed var(--accent);border-radius:14px;background:rgba(31,68,51,.12);display:grid;place-items:center;font-size:1.25rem;font-weight:700;color:var(--ink);z-index:60;pointer-events:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* ---------- top bar ---------- */
@@ -112,6 +112,12 @@ li.card-row.flash{animation:flash .9s ease-out}
 .share-main,.share-how{display:flex;flex-wrap:wrap;gap:.5rem}
 .share-how{margin-top:.35rem}
 .share .lbl{display:block;font-size:.85rem;font-weight:600}
+.save-status{display:flex;align-items:center;gap:.5rem;font-size:.9rem;font-weight:600;margin:.25rem 0 .75rem}
+.save-status .dot{flex:none;width:.65rem;height:.65rem;border-radius:50%;background:#3d9a62}
+.save-status.dirty{color:var(--warn)}
+.save-status.dirty .dot{background:#d08a1c}
+.warn-note{margin:0 0 1rem;padding:.6rem .8rem;border-radius:8px;background:var(--warn-bg);color:var(--warn);font-size:.875rem;max-width:62ch}
+.share code{font-size:.85em}
 .share-size{font-size:.8rem;color:var(--ink-2);margin:.5rem 0 .9rem}
 .preview-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 5.5rem);max-height:calc(100vh - 6.5rem);overflow-y:auto;padding-bottom:1rem}
 @media (max-width:960px){.preview-col{position:static}}
@@ -183,10 +189,8 @@ footer{max-width:1280px;margin:0 auto;padding:0 1.25rem 2rem;color:var(--ink-2);
       <span class="deckname" id="barDeckName"></span>
     </div>
     </div>
-    <span class="status" id="status" aria-live="polite"><span class="dot"></span><span id="statusText">Backed up</span></span>
+    <span class="status" id="status" aria-live="polite"><span class="dot"></span><span id="statusText">Sample deck loaded</span></span>
     <div class="actions">
-      <button class="btn primary" id="btnBackup" type="button">Download backup</button>
-      <label class="btn" id="btnImport" for="importFile">Import backup</label>
       <button class="btn ghost" id="btnNew" type="button">New deck</button>
       <input type="file" id="importFile" accept=".json,application/json,.html,.htm,text/html" class="fileinput">
     </div>
@@ -197,7 +201,7 @@ footer{max-width:1280px;margin:0 auto;padding:0 1.25rem 2rem;color:var(--ink-2);
   <div class="editor-col">
     <section class="panel" aria-labelledby="hDeck">
       <h2 id="hDeck">Deck</h2>
-      <p class="help">Nothing is saved on this site. When you close this page your cards are gone unless you download a backup. Import that file later to keep working, or drag it onto this page.</p>
+      <p class="help">Nothing is saved on this site. Download your deck file (right side of the page) before you close this page, or your work is lost.</p>
       <div class="settings">
         <div class="field span2">
           <label for="deckTitle">Deck name</label>
@@ -262,24 +266,29 @@ footer{max-width:1280px;margin:0 auto;padding:0 1.25rem 2rem;color:var(--ink-2);
       <p class="pv-note">This is how a card looks on a phone. Tap the card to flip it. Arrow keys move between cards when the preview has focus.</p>
     </div>
     <section class="panel share" aria-labelledby="hShare">
-      <h2 id="hShare">Share the game</h2>
-      <p class="help">The game file is a single web page with every card, your colors and your logo inside it. Put it online and anyone with the link can play on their phone.</p>
+      <h2 id="hShare">Save and publish</h2>
+      <div class="save-status" id="saveStatus" role="status"><span class="dot"></span><span id="saveStatusText">Sample deck loaded. Download the file to keep your work.</span></div>
+      <p class="warn-note"><strong>Nothing is stored on this site.</strong> Download your deck file before you close this page, or all your work is lost.</p>
       <div class="share-main">
-        <button class="btn primary" type="button" id="btnGame">Download game file</button>
-        <button class="btn" type="button" id="btnCopy">Copy game code</button>
+        <button class="btn primary" type="button" id="btnGame">Download deck file</button>
+        <label class="btn" id="btnImport" for="importFile">Open a saved deck file</label>
+        <input type="file" id="importFile" accept=".html,.htm,text/html,.json,application/json" class="fileinput">
       </div>
+      <p class="help" style="margin:.6rem 0 0">One file does everything. It is your saved work, the game your players open, and the file you open here to keep editing. It saves as <code>index.html</code>. Keep it in a folder for this deck and replace the old copy each time.</p>
       <p class="share-size" id="gameSize"></p>
-      <span class="lbl">Instructions for putting it online</span>
+      <span class="lbl">Put it online so players can open it</span>
+      <p class="help" style="margin:.2rem 0 .5rem">Upload the file you just downloaded. Choose where:</p>
       <div class="share-how">
         <button class="btn" type="button" id="howGitHub">GitHub Pages</button>
         <button class="btn" type="button" id="howSites">Google Sites</button>
         <button class="btn" type="button" id="howMs">Microsoft</button>
       </div>
-      <p class="help" style="margin:.9rem 0 0">The backup file and the game file are different. Use the backup to keep editing here. Use the game file to publish. A game file can also be imported here if you lose the backup.</p>
+      <p class="help" style="margin:.75rem 0 .4rem">Google Sites needs the code pasted in instead of a file upload:</p>
+      <button class="btn" type="button" id="btnCopy">Copy game code</button>
     </section>
   </aside>
 </main>
-<footer>Backups are plain JSON files that include your cards, colors and logo. Game files are single web pages named index.html. Version 1.4.0.</footer>
+<footer>Your deck file is one web page that holds the game, your cards, colors and logo. Open it here to keep editing. Nothing is stored on this site. Version 1.4.1. Copyright &copy; 2026 DeCaro Associates.</footer>
 
 <div id="measure" aria-hidden="true"></div>
 
@@ -297,7 +306,7 @@ footer{max-width:1280px;margin:0 auto;padding:0 1.25rem 2rem;color:var(--ink-2);
 
 /* ======================================================================
    Poll Worker Flashcard Maker — builder (part 1)
-   - No persistence: state lives in memory only. Backup = single JSON file.
+   - No persistence: state lives in memory only. Saving = the exported game file (index.html), which embeds the deck.
    - Card design is fixed; users may change only background color,
      text color and logo.
    ====================================================================== */
@@ -305,7 +314,7 @@ footer{max-width:1280px;margin:0 auto;padding:0 1.25rem 2rem;color:var(--ink-2);
 var APP_ID = 'poll-worker-flashcard-maker';
 var OLD_APP_IDS = ['john-ferenz-flashcard-maker'];
 var SCHEMA_VERSION = 1;
-var APP_VERSION = '1.4.0';
+var APP_VERSION = '1.4.1';
 var LIMITS = { question: 200, answer: 400, title: 80, closing: 600, cards: 500 };
 var FIT = { qMax: 26, qMin: 18, aMax: 24, aMin: 17, endMax: 24, endMin: 16 };
 var LOGO_MAX_W = 800, LOGO_MAX_BYTES = 10 * 1024 * 1024, SVG_MAX_BYTES = 400 * 1024;
@@ -379,16 +388,20 @@ function fmtBytes(n){ return n < 1024 ? n+' B' : n < 1048576 ? (n/1024).toFixed(
 function slug(s){ return (s||'deck').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50) || 'deck'; }
 
 /* ---------------- dirty tracking ---------------- */
+function setStatus(isDirty, headerText, panelText){
+  $('status').classList.toggle('dirty', isDirty);
+  $('saveStatus').classList.toggle('dirty', isDirty);
+  $('statusText').textContent = headerText;
+  $('saveStatusText').textContent = panelText;
+}
 function markDirty(){
   dirty = true;
   if (typeof refreshGameSize === 'function') refreshGameSize();
-  $('status').classList.add('dirty');
-  $('statusText').textContent = 'Changes not backed up';
+  setStatus(true, 'Not saved yet', 'Not saved yet. Download your deck file to keep these changes.');
 }
 function markClean(){
   dirty = false;
-  $('status').classList.remove('dirty');
-  $('statusText').textContent = 'Backed up';
+  setStatus(false, 'Saved to your computer', 'Saved to your computer. Keep the file to edit again later.');
 }
 window.addEventListener('beforeunload', function(e){
   if (!dirty) return;
@@ -864,26 +877,13 @@ function saveFile(name, text, mime){
     return 'saved';
   });
 }
-function downloadBackup(){
-  var data = JSON.stringify(buildBackup(), null, 2);
-  var stamp = new Date().toISOString().slice(0,10);
-  var name = slug(state.title) + '-backup-' + stamp + '.json';
-  var size = new Blob([data]).size;
-  $('btnBackup').disabled = true;
-  saveFile(name, data).then(function(result){
-    if (result === 'saved'){ markClean(); toast('Backup saved as ' + name + ' (' + fmtBytes(size) + ').'); }
-    else if (result === 'declined') toast('Backup not saved. Your changes are still not backed up.');
-    else toast('A save prompt is already open. Finish it, then try again.');
-  }).catch(function(err){ alertDlg('Backup not saved', err.message); })
-    .then(function(){ $('btnBackup').disabled = false; });
-}
 function validateBackup(obj){
   // Returns { deck, errors[], warnings[] }. Errors block import; warnings are fixed automatically.
   var errors = [], warnings = [];
-  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return { errors: ['The file does not contain a backup.'] };
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return { errors: ['The file does not contain a deck.'] };
   if (obj.app !== APP_ID && OLD_APP_IDS.indexOf(obj.app) < 0) errors.push('This file was not made by the Poll Worker Flashcard Maker.');
   if (typeof obj.schemaVersion !== 'number') errors.push('The file has no format version.');
-  else if (obj.schemaVersion > SCHEMA_VERSION) errors.push('This backup was made by a newer version of the maker (format ' + obj.schemaVersion + '). This page reads format ' + SCHEMA_VERSION + ' and older.');
+  else if (obj.schemaVersion > SCHEMA_VERSION) errors.push('This file was made by a newer version of the maker (format ' + obj.schemaVersion + '). This page reads format ' + SCHEMA_VERSION + ' and older.');
   var d = obj.deck;
   if (!d || typeof d !== 'object') errors.push('The file has no deck in it.');
   if (errors.length) return { errors: errors };
@@ -910,12 +910,12 @@ function validateBackup(obj){
   if (deck.cards.length > LIMITS.cards){ warnings.push('Only the first ' + LIMITS.cards + ' of ' + deck.cards.length + ' cards were kept.'); deck.cards = deck.cards.slice(0, LIMITS.cards); }
   if (skipped) warnings.push(skipped + (skipped === 1 ? ' card was' : ' cards were') + ' unreadable and left out.');
   if (trimmed) warnings.push(trimmed + (trimmed === 1 ? ' card had' : ' cards had') + ' text over the length limit; the extra was cut.');
-  if (!deck.cards.length) warnings.push('The backup has no cards.');
+  if (!deck.cards.length) warnings.push('The deck has no cards.');
   return { deck: deck, errors: [], warnings: warnings };
 }
 function importFile(file){
   if (!file) return;
-  if (file.size > 25 * 1024 * 1024){ alertDlg('Import stopped', 'That file is ' + fmtBytes(file.size) + ', which is larger than any backup this maker creates.'); return; }
+  if (file.size > 25 * 1024 * 1024){ alertDlg('Import stopped', 'That file is ' + fmtBytes(file.size) + ', which is larger than any deck file this maker creates.'); return; }
   var r = new FileReader();
   r.onerror = function(){ alertDlg('Import stopped', 'The file could not be read.'); };
   r.onload = function(){
@@ -924,16 +924,16 @@ function importFile(file){
     if (isHtml){
       var doc = new DOMParser().parseFromString(text, 'text/html');
       var s = doc.getElementById('deck');
-      if (!s){ alertDlg('Import stopped', 'This web page is not a game file from the Poll Worker Flashcard Maker.'); return; }
+      if (!s){ alertDlg('Import stopped', 'This web page is not a deck file from the Poll Worker Flashcard Maker.'); return; }
       text = s.textContent;
     }
     try { obj = JSON.parse(text); }
-    catch (e){ alertDlg('Import stopped', isHtml ? 'The deck inside this game file is damaged and cannot be read.' : 'The file is not a valid backup. It may be damaged, or it may be a different kind of file.'); return; }
+    catch (e){ alertDlg('Import stopped', isHtml ? 'The deck inside this file is damaged and cannot be read.' : 'The file is not a valid deck file. It may be damaged, or it may be a different kind of file.'); return; }
     var v = validateBackup(obj);
     if (v.errors.length){ alertDlg('Import stopped', null, v.errors); return; }
-    var body = 'The backup “' + v.deck.title + '” has ' + v.deck.cards.length + (v.deck.cards.length === 1 ? ' card' : ' cards') + (obj.savedAt ? ', saved ' + new Date(obj.savedAt).toLocaleString() : '') + '. It will replace the deck you have open now.';
-    if (dirty) body += ' Your current changes have not been backed up and will be lost.';
-    confirmDlg('Import this backup?', body, v.warnings.length ? v.warnings : null, 'Replace deck', function(){
+    var body = 'The deck “' + v.deck.title + '” has ' + v.deck.cards.length + (v.deck.cards.length === 1 ? ' card' : ' cards') + (obj.savedAt ? ', saved ' + new Date(obj.savedAt).toLocaleString() : '') + '. It will replace the deck you have open now.';
+    if (dirty) body += ' Your current changes are not saved and will be lost.';
+    confirmDlg('Open this deck file?', body, v.warnings.length ? v.warnings : null, 'Replace deck', function(){
       loadDeck(v.deck);
       markClean();
       toast('Imported “' + v.deck.title + '”.');
@@ -1007,7 +1007,7 @@ function buildGame(){
 }
 function updateGameSize(){
   var n = new Blob([buildGame()]).size;
-  $('gameSize').textContent = 'Game file size: ' + fmtBytes(n) + ', ' + state.cards.length + (state.cards.length === 1 ? ' card.' : ' cards.');
+  $('gameSize').textContent = 'File size: ' + fmtBytes(n) + ', ' + state.cards.length + (state.cards.length === 1 ? ' card.' : ' cards.');
 }
 var refreshGameSize = debounce(updateGameSize, 600);
 function preflight(next){
@@ -1030,10 +1030,10 @@ function downloadGame(){
     var html = buildGame();
     $('btnGame').disabled = true;
     saveFile('index.html', html, 'text/html').then(function(result){
-      if (result === 'saved') toast('Game file saved as index.html (' + fmtBytes(new Blob([html]).size) + ').');
-      else if (result === 'declined') toast('Game file not saved.');
+      if (result === 'saved'){ markClean(); toast('Deck file saved as index.html (' + fmtBytes(new Blob([html]).size) + '). Keep it to edit again later.'); }
+      else if (result === 'declined') toast('Deck file not saved. Your changes are still not saved.');
       else toast('A save prompt is already open. Finish it, then try again.');
-    }).catch(function(err){ alertDlg('Game file not saved', err.message); })
+    }).catch(function(err){ alertDlg('Deck file not saved', err.message); })
       .then(function(){ $('btnGame').disabled = false; });
   });
 }
@@ -1076,7 +1076,7 @@ function howGitHub(){
     P('GitHub Pages hosts the game file as its own web page with its own link. This is the most reliable option. It takes about ten minutes the first time.'),
     H('First time'),
     STEPS([
-      'Click Download game file on this page. It saves as index.html. Keep that name.',
+      'Click Download deck file on this page. It saves as index.html. Keep that name.',
       ['Go to ', { code: 'github.com' }, ' and create a free account. Your user name becomes part of the link, so pick something like your office name.'],
       ['Click the + in the top right corner, then New repository. Name it something short, such as ', { code: 'poll-worker-cards' }, '. Choose Public. Click Create repository.'],
       'On the new repository page, click the link “uploading an existing file.” Drag index.html into the box. Click Commit changes.',
@@ -1087,7 +1087,7 @@ function howGitHub(){
     ]),
     H('Updating the game later'),
     STEPS([
-      'Make your changes here and click Download game file again.',
+      'Make your changes here and click Download deck file again.',
       'In your repository, click Add file, then Upload files. Drag in the new index.html. It replaces the old one. Click Commit changes.',
       'The link stays the same. Changes show up within a few minutes. If you still see the old cards, refresh the page.'
     ]),
@@ -1143,9 +1143,8 @@ function init(){
   renderList();
   renderPreview(0);
   measureAll();
-  markClean();
   dirty = false;
-  $('statusText').textContent = 'Sample deck loaded';
+  setStatus(false, 'Sample deck loaded', 'Sample deck loaded. Download the file to keep your work.');
 
   $('deckTitle').addEventListener('input', function(e){ state.title = e.target.value; $('barDeckName').textContent = state.title; markDirty(); refreshPreview(); });
   $('closing').addEventListener('input', function(e){
@@ -1165,11 +1164,10 @@ function init(){
   });
   $('btnAdd').addEventListener('click', addCard);
   $('search').addEventListener('input', debounce(renderList, 150));
-  $('btnBackup').addEventListener('click', downloadBackup);
   $('importFile').addEventListener('change', function(e){ importFile(e.target.files[0]); e.target.value = ''; });
   $('btnNew').addEventListener('click', function(){
     var msg = 'This clears every card and the closing message. Your colors and logo stay.';
-    if (dirty) msg += ' Your current changes have not been backed up and will be lost.';
+    if (dirty) msg += ' Your current changes are not saved and will be lost.';
     confirmDlg('Start a new deck?', msg, null, 'Start new deck', function(){
       loadDeck(blankDeck()); markDirty();
       var first = document.querySelector('#cardList textarea'); if (first) first.focus();
@@ -1187,7 +1185,7 @@ function init(){
     if (!f) return;
     if (/\.(json|html?)$/i.test(f.name) || f.type === 'application/json' || f.type === 'text/html') importFile(f);
     else if (/^image\//.test(f.type)) handleLogo(f);
-    else alertDlg('File not used', 'Drop a backup file (.json) or game file (index.html) to import a deck, or an image to use as the logo.');
+    else alertDlg('File not used', 'Drop a deck file (index.html) to open a deck, or an image to use as the logo.');
   });
   $('btnGame').addEventListener('click', downloadGame);
   $('btnCopy').addEventListener('click', copyGame);
